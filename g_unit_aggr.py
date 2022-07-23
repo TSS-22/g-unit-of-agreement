@@ -38,7 +38,7 @@ def g_unit_aggr(arg_values,arg_precision=100, arg_stdDev=1, arg_widthDistri=3.5)
                     x_range = range_values(arg_values[xIdxRow,yIdxCol], std_range, arg_precision)
                     y_range = range_values(arg_values[yIdxRow,yIdxCol], std_range, arg_precision)
                     
-                    if arg_values[xIdxRow,xIdxCol] <= arg_values[yIdxRow,yIdxCol]:
+                    if arg_values[xIdxRow,yIdxCol] <= arg_values[yIdxRow,yIdxCol]:
                         temp_aggr[yIdxCol] = area2distri(y_range,x_range,stdDistri)
                     else:
                         temp_aggr[yIdxCol] = area2distri(x_range,y_range,stdDistri)
