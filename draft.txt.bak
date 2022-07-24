@@ -23,21 +23,3 @@ g_unit_aggr.g_unit_aggr(a)
 end = time.time()
 print(end-start)
 1
-
-
-
-start = time.time()
-g_unit_aggr.g_unit_aggr(a, arg_resolution=20)
-end = time.time()
-print(end-start)
-
-
-
-FACTOR_STD = 3.5
-arg_resolution = 100
-stdDistri = g_unit_aggr.standard_norm_dist(FACTOR_STD, arg_resolution)
-b = g_unit_aggr.range_values(11, FACTOR_STD, arg_resolution)
-c = g_unit_aggr.range_values(10, FACTOR_STD, arg_resolution)
-d = g_unit_aggr.area2distri(b,c,stdDistri)
-
-
