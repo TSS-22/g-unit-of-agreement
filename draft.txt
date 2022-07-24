@@ -1,0 +1,25 @@
+import g_unit_aggr
+import numpy as np
+#a = np.array([[100,100,100],[0,0,0],[50,50,50]])
+a = np.random.rand(10,10)
+import time
+start = time.time()
+g_unit_aggr.g_unit_aggr(a)
+end = time.time()
+print(end-start)
+exit()
+
+
+import g_unit_aggr
+import numpy as np
+import time
+a = np.random.rand(20,20)
+start = time.time()
+g_unit_aggr.g_unit_aggr2(a)
+end = time.time()
+print(end-start)
+start = time.time()
+g_unit_aggr.g_unit_aggr(a)
+end = time.time()
+print(end-start)
+1

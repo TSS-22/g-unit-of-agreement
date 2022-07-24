@@ -28,29 +28,35 @@ def g_unit_aggr(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3
     # Create the corresponding normal distribution density function
     stdDistri = standard_norm_dist(arg_widthDistri, arg_resolution)
 
+    temp_aggr=np.zeros(arg_values.shape[1],float)
+
+    # Init matrix to store result
+    G_matrix = np.zeros([arg_values.shape[1],arg_values.shape[1]], float)
+    range_matrix = np.zeros([arg_values.shape[0],arg_values.shape[1]], np.ndarray)
+
+    xIdxRow=0
+    while xIdxRow < arg_values.shape[0]:
+        yIdxCol=0
+        while yIdxCol < arg_values.shape[1]:
+            range_matrix[xIdxRow, yIdxCol] = range_values(arg_values[xIdxRow, yIdxCol], std_range, arg_resolution)
+            yIdxCol=yIdxCol+1
+        xIdxRow=xIdxRow+1
+
     # Init counter
     xIdxRow = 0
     yIdxRow = 0 
     xIdxCol = 0
     yIdxCol = 0 
 
-    temp_aggr=np.zeros(arg_values.shape[1],float)
-
-    # Init matrix to store result
-    G_matrix = np.zeros([arg_values.shape[1],arg_values.shape[1]], float)
-    #range_matrix = np.zeros([arg_values.shape[0],arg_values.shape[1]], float)
-
+    
     while xIdxRow < arg_values.shape[0]:
         while xIdxCol < arg_values.shape[1]:
             while yIdxRow < arg_values.shape[0]:
                 while yIdxCol < arg_values.shape[1]:
-                    x_range = range_values(arg_values[xIdxRow,yIdxCol], std_range, arg_resolution)
-                    y_range = range_values(arg_values[yIdxRow,yIdxCol], std_range, arg_resolution)
-                    
                     if arg_values[xIdxRow,yIdxCol] <= arg_values[yIdxRow,yIdxCol]:
-                        temp_aggr[yIdxCol] = area2distri(y_range,x_range,stdDistri)
+                        temp_aggr[yIdxCol] = area2distri(range_matrix[yIdxRow,yIdxCol],range_matrix[xIdxRow,yIdxCol],stdDistri)
                     else:
-                        temp_aggr[yIdxCol] = area2distri(x_range,y_range,stdDistri)
+                        temp_aggr[yIdxCol] = area2distri(range_matrix[xIdxRow,yIdxCol],range_matrix[yIdxRow,yIdxCol],stdDistri)
                     yIdxCol = yIdxCol+1
 
                 G_matrix[xIdxRow,yIdxRow] = np.mean(temp_aggr)
@@ -62,7 +68,6 @@ def g_unit_aggr(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3
         
         xIdxCol = 0
         xIdxRow=xIdxRow+1
-
     return G_matrix
 
 def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistri=3.5, arg_learning_rate=0.05):
@@ -79,6 +84,7 @@ def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistr
             while True:
                 arg_stdDev=arg_stdDev-arg_learning_rate
                 ntrp_g_matrix_n1 = entropy_info(g_unit_aggr(arg_values, arg_resolution, arg_stdDev, arg_widthDistri))
+                print(''+str(ntrp_g_matrix_n)+''+str(ntrp_g_matrix_n1))
                 if ntrp_g_matrix_n>=ntrp_g_matrix_n1:
                     return g_unit_aggr(arg_values, arg_resolution, arg_stdDev+arg_learning_rate, arg_widthDistri)
     else:
@@ -87,3 +93,4 @@ def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistr
             ntrp_g_matrix_n1 = entropy_info(g_unit_aggr(arg_values, arg_resolution, arg_widthDistri, arg_stdDev))
             if ntrp_g_matrix_n>=ntrp_g_matrix_n1:
                 return g_unit_aggr(arg_values, arg_resolution, arg_stdDev-arg_learning_rate, arg_widthDistri)
+
