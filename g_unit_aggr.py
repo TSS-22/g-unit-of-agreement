@@ -29,12 +29,14 @@ def g_unit_aggr(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3
     # Create the corresponding normal distribution density function
     stdDistri = standard_norm_dist(arg_widthDistri, arg_resolution)
 
+    # Create a vector in order to store the values of commonality between each variables
     temp_aggr=np.zeros(arg_values.shape[1],float)
 
     # Init matrix to store result
     G_matrix = np.zeros([arg_values.shape[1],arg_values.shape[1]], float)
     range_matrix = np.zeros([arg_values.shape[0],arg_values.shape[1]], np.ndarray)
 
+    # Create the matrix that store all the range value to only compute them once
     xIdxRow=0
     while xIdxRow < arg_values.shape[0]:
         yIdxCol=0
@@ -44,31 +46,31 @@ def g_unit_aggr(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3
         xIdxRow=xIdxRow+1
 
     # Init counter
-    xIdxRow = 0
     yIdxRow = 0 
-    xIdxCol = 0
     yIdxCol = 0 
-
+    xIdxRow = 0
     
-    while xIdxRow < arg_values.shape[0]:
-        while xIdxCol < arg_values.shape[1]:
-            while yIdxRow < arg_values.shape[0]:
-                while yIdxCol < arg_values.shape[1]:
-                    if arg_values[xIdxRow,yIdxCol] <= arg_values[yIdxRow,yIdxCol]:
-                        temp_aggr[yIdxCol] = area2distri(range_matrix[yIdxRow,yIdxCol],range_matrix[xIdxRow,yIdxCol],stdDistri)
-                    else:
-                        temp_aggr[yIdxCol] = area2distri(range_matrix[xIdxRow,yIdxCol],range_matrix[yIdxRow,yIdxCol],stdDistri)
-                    yIdxCol = yIdxCol+1
-
-                G_matrix[xIdxRow,yIdxRow] = np.mean(temp_aggr)
-                yIdxCol = 0 
-                yIdxRow = yIdxRow+1
-            
-            yIdxRow = 0
-            xIdxCol=xIdxCol+1
-        
-        xIdxCol = 0
+    # Compute the upper triangle (as the matrix is symmetrical) of the g unit values of the matrix
+    for val1_row in range_matrix:
+        # Only take the upper triangle
+        for val2_row in range_matrix[xIdxRow:,:]:
+            for val1_col, val2_col in zip(val1_row, val2_row):
+                if np.mean(val1_col) <= np.mean(val2_col):
+                    temp_aggr[yIdxCol] = area2distri(val2_col,val1_col,stdDistri)
+                else:
+                    temp_aggr[yIdxCol] = area2distri(val1_col,val2_col,stdDistri)
+                yIdxCol = yIdxCol+1
+            # Store the value in the final matrix, while correcting for the offset due to calculating only the upper triangle
+            G_matrix[xIdxRow,xIdxRow+yIdxRow] = np.mean(temp_aggr)
+            yIdxRow = yIdxRow+1
+            yIdxCol = 0          
+        yIdxRow = 0
         xIdxRow=xIdxRow+1
+
+    # We copy back the upper triangle to the lower triangle
+    # From https://stackoverflow.com/a/58806735
+    G_matrix = G_matrix + G_matrix.T - np.diag(np.diag(G_matrix))
+
     return G_matrix
 
 def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistri=3.5, arg_learning_rate=0.05):
@@ -114,45 +116,3 @@ def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistr
 
 #     return range_matrix
 
-def g_opti(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3.5):  
-    # Create the standard deviation used factor used for aggreement computation
-    std_range = np.std(arg_values)*arg_stdDev
-
-    # Create the corresponding normal distribution density function
-    stdDistri = standard_norm_dist(arg_widthDistri, arg_resolution)
-
-    temp_aggr=np.zeros(arg_values.shape[1],float)
-
-    # Init matrix to store result
-    G_matrix = np.zeros([arg_values.shape[1],arg_values.shape[1]], float)
-    range_matrix = np.zeros([arg_values.shape[0],arg_values.shape[1]], np.ndarray)
-
-    xIdxRow=0
-    while xIdxRow < arg_values.shape[0]:
-        yIdxCol=0
-        while yIdxCol < arg_values.shape[1]:
-            range_matrix[xIdxRow, yIdxCol] = range_values(arg_values[xIdxRow, yIdxCol], std_range, arg_resolution)
-            yIdxCol=yIdxCol+1
-        xIdxRow=xIdxRow+1
-
-    # Init counter
-    yIdxRow = 0 
-    yIdxCol = 0 
-    xIdxRow = 0
-    
-    for val1_row in range_matrix:
-        for val2_row in range_matrix:
-            for val1_col, val2_col in zip(val1_row, val2_row):
-                if np.mean(val1_col) <= np.mean(val2_col):
-                    temp_aggr[yIdxCol] = area2distri(val2_col,val1_col,stdDistri)
-                else:
-                    temp_aggr[yIdxCol] = area2distri(val1_col,val2_col,stdDistri)
-                yIdxCol = yIdxCol+1
-
-            G_matrix[xIdxRow,yIdxRow] = np.mean(temp_aggr)
-            yIdxRow = yIdxRow+1
-            yIdxCol = 0          
-        yIdxRow = 0
-        xIdxRow=xIdxRow+1
-
-    return G_matrix
