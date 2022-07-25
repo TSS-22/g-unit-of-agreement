@@ -99,11 +99,34 @@ def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistr
 
 
 # DEBUG FUNCTION TO GET THE RANGE MATRIX
-def range_matrix(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3.5):  
+# def range_matrix(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3.5):  
+#     # Create the standard deviation used factor used for aggreement computation
+#     std_range = np.std(arg_values)*arg_stdDev
+
+#     range_matrix = np.zeros([arg_values.shape[0],arg_values.shape[1]], np.ndarray)
+#     xIdxRow=0
+#     while xIdxRow < arg_values.shape[0]:
+#         yIdxCol=0
+#         while yIdxCol < arg_values.shape[1]:
+#             range_matrix[xIdxRow, yIdxCol] = range_values(arg_values[xIdxRow, yIdxCol], std_range, arg_resolution)
+#             yIdxCol=yIdxCol+1
+#         xIdxRow=xIdxRow+1
+
+#     return range_matrix
+
+def g_opti(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3.5):  
     # Create the standard deviation used factor used for aggreement computation
     std_range = np.std(arg_values)*arg_stdDev
 
+    # Create the corresponding normal distribution density function
+    stdDistri = standard_norm_dist(arg_widthDistri, arg_resolution)
+
+    temp_aggr=np.zeros(arg_values.shape[1],float)
+
+    # Init matrix to store result
+    G_matrix = np.zeros([arg_values.shape[1],arg_values.shape[1]], float)
     range_matrix = np.zeros([arg_values.shape[0],arg_values.shape[1]], np.ndarray)
+
     xIdxRow=0
     while xIdxRow < arg_values.shape[0]:
         yIdxCol=0
@@ -112,4 +135,24 @@ def range_matrix(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=
             yIdxCol=yIdxCol+1
         xIdxRow=xIdxRow+1
 
-    return range_matrix
+    # Init counter
+    yIdxRow = 0 
+    yIdxCol = 0 
+    xIdxRow = 0
+    
+    for val1_row in range_matrix:
+        for val2_row in range_matrix:
+            for val1_col, val2_col in zip(val1_row, val2_row):
+                if np.mean(val1_col) <= np.mean(val2_col):
+                    temp_aggr[yIdxCol] = area2distri(val2_col,val1_col,stdDistri)
+                else:
+                    temp_aggr[yIdxCol] = area2distri(val1_col,val2_col,stdDistri)
+                yIdxCol = yIdxCol+1
+
+            G_matrix[xIdxRow,yIdxRow] = np.mean(temp_aggr)
+            yIdxRow = yIdxRow+1
+            yIdxCol = 0          
+        yIdxRow = 0
+        xIdxRow=xIdxRow+1
+
+    return G_matrix

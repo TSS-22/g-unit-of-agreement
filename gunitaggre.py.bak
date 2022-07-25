@@ -2,7 +2,7 @@ def g_unit_aggr_2p(arg_x, arg_y, arg_values,arg_precision=100, arg_stdDev=1, arg
     # Function to compute the density function of the standard normal distribution
     def standard_norm_dist(arg_stdDev, arg_precision):
         x = np.linspace(-arg_stdDev,arg_stdDev,arg_precision)
-        prob_density = np.exp(-0.5*(x)**2)/np.sqrt(2*np.pi)
+        stdDistri = np.exp(-0.5*(x)**2)/np.sqrt(2*np.pi)
         return prob_density
 
     def range_values(x, FACTOR_STD, arg_precision):
