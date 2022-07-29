@@ -1,0 +1,1 @@
+C:\Users\YoupiYoupin\Documents\GitHub\g-unit-of-agreement\Rust\g_unit_aggr\target\debug\main.exe: C:\Users\YoupiYoupin\Documents\GitHub\g-unit-of-agreement\Rust\g_unit_aggr\src\bin\main.rs C:\Users\YoupiYoupin\Documents\GitHub\g-unit-of-agreement\Rust\g_unit_aggr\src\lib.rs
