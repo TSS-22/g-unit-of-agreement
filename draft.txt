@@ -46,17 +46,25 @@ import g_unit_aggr
 import numpy as np
 #a = np.array([[100,100,100],[0,0,0],[50,50,50]])
 import time
-a = np.random.rand(10,10)
-a100 = g_unit_aggr.g_unit_aggr(a,arg_resolution=1000)
-a10 = g_unit_aggr.g_unit_aggr(a, arg_resolution=500)
-print(np.mean(np.abs((a100-a10)/a100*100)))
+a = np.random.rand(5,5)
+aOld = g_unit_aggr.g_unit_aggr(a, arg_resolution = 15)
+aNew = g_unit_aggr.g_unit_aggr2(a)
+print(aOld);
+print(aNew)
+a
 
-a = np.random.rand(150,150)
+a = np.random.rand(500,500)
 start = time.time()
-g_unit_aggr.g_unit_aggr(a)
+g_unit_aggr.g_unit_aggr2(a)
 end = time.time()
 print(end-start)
 
 
 
 core::slice::iter::Chunks<alloc::vec::Vec<f32>>
+
+[0.24537743, 0.31192764, 0.37847784, 0.44502805, 0.51157826, 0.57812847, 0.64467867, 0.71122888, 0.77777909, 0.8443293]
+range_values(0.544853363, 3.5, 10):
+    return np.linspace(x-FACTOR_STD,
+        x+FACTOR_STD,
+        arg_resolution)

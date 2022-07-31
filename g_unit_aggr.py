@@ -1,6 +1,7 @@
 import numpy as np
 
 # Shanon entropy, +0.1 is addedd to prevent the error of divided by zero
+
 def entropy_info(arg_matrix):
     return np.sum(np.power(arg_matrix,2)*np.log(np.power(arg_matrix,2)+0.1))
 
@@ -19,6 +20,50 @@ def range_values(x, FACTOR_STD, arg_resolution):
 def area2distri(val1,val2,stdDistri):
     return np.sum(np.fmin(stdDistri[val1<=np.max(val2)] ,
         stdDistri[val2>=np.min(val1)]))/np.sum(stdDistri)
+
+def area2distri2(val1,val2,width_distri):
+    if (val1-val2)/width_distri >=1:
+        return 0
+    else:
+        return (1-(val1-val2)/width_distri)**1*np.exp(1)/np.exp((1-(val1-val2)/width_distri)**1)
+
+def g_unit_aggr2(data, width_distri=1):  
+    std_range = np.std(data)*width_distri
+    
+    # Create a vector in order to store the values of commonality between each variables
+    temp_aggr=np.zeros(data.shape[1],float)
+
+    # Init matrix to store result
+    G_matrix = np.zeros([data.shape[1],data.shape[1]], float)
+
+    # Init counter
+    yIdxRow = 0 
+    yIdxCol = 0 
+    xIdxRow = 0
+    
+    # Compute the upper triangle (as the matrix is symmetrical) of the g unit values of the matrix
+    for val1_row in data:
+        # Only take the upper triangle
+        for val2_row in data[xIdxRow:,:]:
+            for val1, val2 in zip(val1_row, val2_row):
+                if val1 <= val2:
+                    temp_aggr[yIdxCol] = area2distri2(val2,val1,std_range)
+                else:
+                    temp_aggr[yIdxCol] = area2distri2(val1,val2,std_range)
+                yIdxCol = yIdxCol+1
+            # Store the value in the final matrix, while correcting for the offset due to calculating only the upper triangle
+            G_matrix[xIdxRow,xIdxRow+yIdxRow] = np.mean(temp_aggr)
+            yIdxRow = yIdxRow+1
+            yIdxCol = 0          
+        yIdxRow = 0
+        xIdxRow=xIdxRow+1
+
+    # We copy back the upper triangle to the lower triangle
+    # From https://stackoverflow.com/a/58806735
+    G_matrix = G_matrix + G_matrix.T - np.diag(np.diag(G_matrix))
+
+    return G_matrix
+
 
 # arg_values must be a mtrix array, with row = occurences, col = variables
 def g_unit_aggr(arg_values,arg_resolution=100, arg_stdDev=1.0, arg_widthDistri=3.5):  

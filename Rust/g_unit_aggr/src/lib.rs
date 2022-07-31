@@ -8,7 +8,7 @@ fn mean_vecf32(data: &Vec<f32>) -> f32{
     return mean;
 }
 
-pub fn entropy_info(matrix: Vec<Vec<f32>>) -> f32{
+fn entropy_info(matrix: Vec<Vec<f32>>) -> f32{
     let mut entropy_values: f32 = 0.0;
 
     for mat_row in matrix {
@@ -19,9 +19,12 @@ pub fn entropy_info(matrix: Vec<Vec<f32>>) -> f32{
     return entropy_values;
 }
 
-pub fn area2distri(val1: f32, val2: f32, width_distri: f32) -> f32{
-    let area: f32 = (0.5+((((val1-val2)/width_distri)*(width_distri*2.0)-width_distri).tanh()/2.0)).round();
-    return area;
+fn area2distri(val1: f32, val2: f32, width_distri: f32) -> f32{
+    let mut area:f32 = 0f32;
+    if  (val1-val2)/width_distri < 1f32{
+        area = ((1f32-(val1-val2)/width_distri).powf(1.0)*1f32.exp())/(1f32-(val1-val2)/width_distri).powf(1.0).exp();
+    }
+    return area as f32;
 }
 
 pub fn g_unit_aggr(data: Vec<Vec<f32>>, width_distri: f32) -> Vec<Vec<f32>>{

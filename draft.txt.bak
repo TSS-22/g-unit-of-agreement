@@ -41,15 +41,15 @@ c = g_unit_aggr.range_values(10, FACTOR_STD, arg_resolution)
 d = g_unit_aggr.area2distri(b,c,stdDistri)
 
 
+
 import g_unit_aggr
 import numpy as np
 #a = np.array([[100,100,100],[0,0,0],[50,50,50]])
 import time
-a = np.random.rand(100,100)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
+a = np.random.rand(10,10)
+a100 = g_unit_aggr.g_unit_aggr(a,arg_resolution=1000)
+a10 = g_unit_aggr.g_unit_aggr(a, arg_resolution=500)
+print(np.mean(np.abs((a100-a10)/a100*100)))
 
 a = np.random.rand(150,150)
 start = time.time()
@@ -57,110 +57,6 @@ g_unit_aggr.g_unit_aggr(a)
 end = time.time()
 print(end-start)
 
-a = np.random.rand(200,200)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
 
-a = np.random.rand(250,250)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
 
-a = np.random.rand(300,300)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(400,400)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(500,500)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(550,550)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(600,600)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(650,650)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(700,700)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(750,750)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(800,800)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(850,850)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(900,900)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(950,950)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(1000,1000)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(5000,5000)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(10000,10000)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
-
-a = np.random.rand(50000,50000)
-start = time.time()
-g_unit_aggr.g_unit_aggr(a)
-end = time.time()
-print(end-start)
+core::slice::iter::Chunks<alloc::vec::Vec<f32>>
