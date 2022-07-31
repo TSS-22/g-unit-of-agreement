@@ -43,22 +43,29 @@ d = g_unit_aggr.area2distri(b,c,stdDistri)
 
 
 import g_unit_aggr
+import g_oxy
 import numpy as np
-#a = np.array([[100,100,100],[0,0,0],[50,50,50]])
+a = np.array([[1,1,1],[1,1,1],[0.2,0.3,0.5]])
 import time
 a = np.random.rand(5,5)
-aOld = g_unit_aggr.g_unit_aggr(a, arg_resolution = 15)
-aNew = g_unit_aggr.g_unit_aggr2(a)
+aOld = g_unit_aggr.g_unit_aggr2(a)
+aNew = np.array(g_oxy.g_unit(a,1.4))
 print(aOld);
 print(aNew)
 a
 
 a = np.random.rand(500,500)
 start = time.time()
-g_unit_aggr.g_unit_aggr2(a)
+np.array(g_oxy.g_unit(a,1.4))
 end = time.time()
 print(end-start)
 
+import time
+a = np.random.rand(500,500)
+start = time.time()
+g_oxy.g_unit(a,3.5)
+end = time.time()
+print(end-start)
 
 
 core::slice::iter::Chunks<alloc::vec::Vec<f32>>
@@ -68,3 +75,22 @@ range_values(0.544853363, 3.5, 10):
     return np.linspace(x-FACTOR_STD,
         x+FACTOR_STD,
         arg_resolution)
+		
+		
+		
+		
+		use pyo3::prelude::*;
+mod g_unit_aggr;
+
+/// Formats the sum of two numbers as string.
+#[pyfunction]
+fn g_unit(data: Vec<Vec<f32>>, width_distri: f32) -> PyResult<Vec<Vec<f32>>> {
+    Ok(g_unit_aggr::g_unit_aggr(data, width_distri))
+}
+
+/// A Python module implemented in Rust.
+#[pymodule]
+fn g_oxy(_py: Python, m: &PyModule) -> PyResult<()> {
+    m.add_function(wrap_pyfunction!(g_unit, m)?)?;
+    Ok(())
+}
