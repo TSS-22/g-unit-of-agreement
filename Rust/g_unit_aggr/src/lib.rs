@@ -8,6 +8,27 @@ fn mean_vecf32(data: &Vec<f32>) -> f32{
     return mean;
 }
 
+fn mean_m2df32(data: Vec<Vec<f32>>) -> f32{
+    let mut vec_mean: Vec<f32> = Vec::new();
+    for row in data{
+        vec_mean.push(mean_vecf32(&row));
+    }
+    let data_mean: f32 = mean_vecf32(&vec_mean);
+    return data_mean;
+}
+
+fn std_m2df32(data: Vec<Vec<f32>>) -> f32{
+    let data_mean = mean_m2df32(data.clone());
+    let mut vec_std: Vec<f32> = Vec::new();
+    for row in data.clone().iter(){
+        for val in row.iter(){
+            vec_std.push((val-data_mean).powi(2));
+        }
+    }
+    let std: f32 = mean_vecf32(&vec_std).sqrt();
+    return std;
+}
+
 fn entropy_info(matrix: Vec<Vec<f32>>) -> f32{
     let mut entropy_values: f32 = 0.0;
 
@@ -22,12 +43,15 @@ fn entropy_info(matrix: Vec<Vec<f32>>) -> f32{
 fn area2distri(val1: f32, val2: f32, width_distri: f32) -> f32{
     let mut area:f32 = 0f32;
     if  (val1-val2)/width_distri < 1f32{
-        area = ((1f32-(val1-val2)/width_distri).powf(1.0)*1f32.exp())/(1f32-(val1-val2)/width_distri).powf(1.0).exp();
+        area = (((1f32-(val1-val2)/width_distri).powf(1.5))*1f32.exp())/((1f32-(val1-val2)/width_distri).powf(1.0).exp());
     }
     return area as f32;
 }
 
-pub fn g_unit_aggr(data: Vec<Vec<f32>>, width_distri: f32) -> Vec<Vec<f32>>{
+pub fn g_unit_aggr(data: Vec<Vec<f32>>, distri_factor: f32) -> Vec<Vec<f32>>{
+    // Find the widthof the std of the data
+    // Get the mean first
+    let width_distri = std_m2df32(data.clone())*distri_factor;
     // Create the vec g matrix aka results
     let mut g_matrix:  Vec<Vec<f32>> = Vec::new();
 
