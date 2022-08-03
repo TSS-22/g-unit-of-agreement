@@ -1,5 +1,6 @@
 use pyo3::prelude::*;
 mod g_unit_aggr;
+mod g_types;
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
