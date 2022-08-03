@@ -1,6 +1,7 @@
-// #[derive(Clone)]
+#[derive(Clone)]
 // Colonne of the input data matrix => one of the variable
 // mod g_types;
+
 
 pub struct ColVar {
     pub data: Vec<f32>,
