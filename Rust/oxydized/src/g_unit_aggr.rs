@@ -1,13 +1,16 @@
+use crate::tools::{entropy_info,area2distri};
+use crate::g_types::{GMatrix, ColVar};
+use crate::mat_op::{add_m2df32,std_m1df32};
 use rayon::prelude::*;
 
 // Function to compute the g matrix
-pub fn g_unit_aggr(data: Vec<Vec<f32>>) -> GMatrix{
+pub fn g_unit_aggr(data: Vec<Vec<f32>>) -> Vec<Vec<f32>>{
     // Find the widthof the std of the data
     // Get the mean first
     let mut handles = Vec::new();
     let mut variable_vector: Vec<ColVar> = Vec::new();
     let mut temp_var_vec: Vec<f32> = Vec::new();
-    let mut g_matrix:  GMatrix = GMatrix::new(Vec::new(),Vec::new(),Vec::new());
+    let mut g_matrix:  Vec<Vec<f32>> = Vec::new();
 
     for i in 0..data[0].len(){
         for row_data in data.iter(){
@@ -78,8 +81,6 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
             }
         }
     }
-
-    
     g_matrix.std = vec![data.std];
     g_matrix.load_std = vec![load_std];
 

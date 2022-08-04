@@ -1,11 +1,13 @@
 use pyo3::prelude::*;
 mod g_unit_aggr;
+mod tools;
 mod g_types;
-
+mod mat_op;
+use crate::g_types::GMatrix;
 /// Formats the sum of two numbers as string.
 #[pyfunction]
-fn g_unit(data: Vec<Vec<f32>>, width_distri: f32) -> PyResult<Vec<Vec<f32>>> {
-    Ok(g_unit_aggr::g_unit_aggr(data, width_distri))
+fn g_unit(data: Vec<Vec<f32>>) -> PyResult<Vec<Vec<f32>>> {
+    Ok(g_unit_aggr::g_unit_aggr(data))
 }
 
 /// A Python module implemented in Rust.

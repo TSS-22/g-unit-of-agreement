@@ -1,5 +1,3 @@
-// mod mat_ops;
-
 pub fn mean_m1df32(data: &Vec<f32>) -> f32{
     let mut sum: f32 = 0f32;
 
@@ -31,7 +29,7 @@ pub fn std_m2df32(data: Vec<Vec<f32>>) -> f32{
     return std;
 }
 
-fn add_m2df32(mat1: Vec<Vec<f32>>, mat2: Vec<Vec<f32>>)->Vec<Vec<f32>>{
+pub fn add_m2df32(mat1: Vec<Vec<f32>>, mat2: Vec<Vec<f32>>)->Vec<Vec<f32>>{
     let mut mat0: Vec<Vec<f32>> = vec![vec![0f32;mat1[0].len()];mat1.len()];
 // https://stackoverflow.com/questions/53823252/what-is-a-faster-way-to-perform-element-wise-summation-of-different-length-vecto
     for (row0, (row1,row2)) in mat0.iter_mut().zip(mat1.iter().zip(mat2.iter())){
@@ -45,7 +43,7 @@ fn add_m2df32(mat1: Vec<Vec<f32>>, mat2: Vec<Vec<f32>>)->Vec<Vec<f32>>{
 }
 
 // Function to compute the standard deviation sur une matrice 1D
-fn std_m1df32(data: Vec<f32>) -> f32{
+pub fn std_m1df32(data: Vec<f32>) -> f32{
     let mut std_value: f32 = 0f32;
     let mut i: f32 = 0f32;
     for val in data.iter(){
