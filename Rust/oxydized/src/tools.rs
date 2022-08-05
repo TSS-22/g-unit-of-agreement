@@ -1,4 +1,4 @@
-pub fn entropy_info(matrix: Vec<Vec<f32>>) -> f32{
+pub fn entropy_info(matrix: &Vec<Vec<f32>>) -> f32{
     let mut entropy_values: f32 = 0.0;
 
     for mat_row in matrix {

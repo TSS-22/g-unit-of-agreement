@@ -50,11 +50,11 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
         temp_row.clear();
     }
     // Find the side of the gradient descent
-    let mut ntrp_n: f32 = entropy_info(temp_g_matrix);
-    let mut ntrp_n1: f32 = entropy_info(compute_gmatrix(temp_g_matrix, data.std*(load_std+learning_bias)));
+    let mut ntrp_n: f32 = entropy_info(&temp_g_matrix);
+    let mut ntrp_n1: f32 = entropy_info(&compute_gmatrix(&data.data, data.std*(load_std+learning_bias)));
 
     if ntrp_n > ntrp_n1{
-        ntrp_n1= entropy_info(compute_gmatrix(temp_g_matrix, data.std*(load_std-learning_bias)));
+        ntrp_n1= entropy_info(&compute_gmatrix(&data.data, data.std*(load_std-learning_bias)));
         if ntrp_n > ntrp_n1{
             g_matrix.data = temp_g_matrix;
         }else{
@@ -62,10 +62,10 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
             loop{
                 load_std = load_std-learning_bias;
                 ntrp_n = ntrp_n1;
-                temp_g_matrix = compute_gmatrix(temp_g_matrix, data.std*load_std);
-                ntrp_n1= entropy_info(temp_g_matrix); 
+                temp_g_matrix = compute_gmatrix(&data.data, data.std*load_std);
+                ntrp_n1= entropy_info(&temp_g_matrix); 
                 if ntrp_n >= ntrp_n1 {
-                    g_matrix.data = temp_g_matrix;
+                    g_matrix.data = temp_g_matrix.clone();
                 }
             }
         }
@@ -74,10 +74,10 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
         loop{
             load_std = load_std+learning_bias;
             ntrp_n = ntrp_n1;
-            temp_g_matrix = compute_gmatrix(temp_g_matrix, data.std*load_std);
-            ntrp_n1= entropy_info(temp_g_matrix); 
+            temp_g_matrix = compute_gmatrix(&data.data, data.std*load_std);
+            ntrp_n1= entropy_info(&temp_g_matrix); 
             if ntrp_n >= ntrp_n1 {
-                g_matrix.data = temp_g_matrix;
+                g_matrix.data = temp_g_matrix.clone();
             }
         }
     }
@@ -87,8 +87,24 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
     return g_matrix;
 }
 
-fn compute_gmatrix(data: Vec<Vec<f32>>, load_std: f32) -> Vec<Vec<f32>>{
+fn compute_gmatrix(data: &Vec<f32>, load_std: f32) -> Vec<Vec<f32>>{
     let mut g_matrix: Vec<Vec<f32>> = Vec::new();
+    let mut temp_row: Vec<f32> = Vec::new();
+    
+    // Compute the matrix for the first time, from ColVar data
+    for x1 in data.iter(){
+        for x2 in data.iter(){
+            // Put the arguments in the adequate order, as the function are2distri() is order dependant
+            if x1.max(*x2)==*x1{
+                temp_row.push(area2distri(*x1, *x2, load_std));
+            } else {
+                temp_row.push(area2distri(*x2, *x1, load_std));
+            }
+        }
+        g_matrix.push(temp_row.clone());
+        // Clear might not be needed as they all make the same length
+        temp_row.clear();
+    }
     return g_matrix;
 }
 
