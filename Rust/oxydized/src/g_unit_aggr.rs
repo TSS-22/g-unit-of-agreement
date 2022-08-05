@@ -5,26 +5,31 @@ use rayon::prelude::*;
 
 // Function to compute the g matrix
 pub fn g_unit_aggr(data: Vec<Vec<f32>>) -> Vec<Vec<f32>>{
-    // Find the widthof the std of the data
-    // Get the mean first
     let mut handles = Vec::new();
     let mut variable_vector: Vec<ColVar> = Vec::new();
     let mut temp_var_vec: Vec<f32> = Vec::new();
-    let mut g_matrix:  Vec<Vec<f32>> = Vec::new();
+    //let mut g_matrix:  Vec<Vec<f32>> = Vec::new();
+    //let mut aggregated_matrix: GMatrix = GMatrix::new(Vec::new(),Vec::new(),Vec::new());
 
     for i in 0..data[0].len(){
         for row_data in data.iter(){
             temp_var_vec.push(row_data[i].clone());
         }
         variable_vector.push(ColVar::new(temp_var_vec.clone(), std_m1df32(temp_var_vec.clone()), 1f32));
-        // Shouldn't be needed
+
         temp_var_vec.clear();
     }
 
     // Compute the GMatrix for every variables, via gradient descent
-    handles = variable_vector.par_iter().map(|x| {let result: GMatrix = create_gmatrix(x);}).collect();
+    handles = variable_vector.par_iter().map(|x| {let result: GMatrix = create_gmatrix(x); return result;}).collect();
+    
     //aggregate_g_matrix();
+    // for handle in handles.iter(){
+    //     aggregated_matrix = 
+    // }
+    let aggregated_matrix =  aggregate_g_matrix(handles);
     // Return the results
+    let g_matrix = aggregated_matrix.data;
     return g_matrix;
 }
 
@@ -66,6 +71,7 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
                 ntrp_n1= entropy_info(&temp_g_matrix); 
                 if ntrp_n >= ntrp_n1 {
                     g_matrix.data = temp_g_matrix.clone();
+                    break;
                 }
             }
         }
@@ -78,6 +84,7 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
             ntrp_n1= entropy_info(&temp_g_matrix); 
             if ntrp_n >= ntrp_n1 {
                 g_matrix.data = temp_g_matrix.clone();
+                break;
             }
         }
     }
@@ -90,7 +97,7 @@ fn create_gmatrix(data: &ColVar) -> GMatrix {
 fn compute_gmatrix(data: &Vec<f32>, load_std: f32) -> Vec<Vec<f32>>{
     let mut g_matrix: Vec<Vec<f32>> = Vec::new();
     let mut temp_row: Vec<f32> = Vec::new();
-    
+
     // Compute the matrix for the first time, from ColVar data
     for x1 in data.iter(){
         for x2 in data.iter(){
