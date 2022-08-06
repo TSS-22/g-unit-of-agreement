@@ -1,6 +1,6 @@
 use crate::tools::{entropy_info,area2distri};
 use crate::g_types::{GMatrix, ColVar};
-use crate::mat_op::{add_m2df32,std_m1df32};
+use crate::mat_op::{add_m2df32,std_m1df32,mean_element_wise_m2df32};
 use rayon::prelude::*;
 
 // Function to compute the g matrix
@@ -124,7 +124,7 @@ fn aggregate_g_matrix(mat: Vec<GMatrix>) -> GMatrix{
     for val1 in mat.iter(){
         vec_std.push(val1.std[0]);
         vec_load_std.push(val1.load_std[0]);
-        temp_g_matrix = add_m2df32(temp_g_matrix,val1.data.clone());
+        temp_g_matrix = mean_element_wise_m2df32(temp_g_matrix,val1.data.clone());
     } 
 
     let end_g_matrix: GMatrix = GMatrix::new(temp_g_matrix,
