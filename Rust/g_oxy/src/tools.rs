@@ -9,7 +9,7 @@ pub fn entropy_info(matrix: &Vec<Vec<f32>>) -> f32{
     return entropy_values;
 }
 
-pub fn area2distri(val1: f32, val2: f32, width_distri: f32) -> f32{
+pub fn area2distri(val1: f32, val2: f32, &width_distri: &f32) -> f32{
     let mut area:f32 = 0f32;
     // To account for the small error as we don't take the full logistic distribution to have a more dynamic behavior 
     let error_margin:f32 = 0.0066929f32;

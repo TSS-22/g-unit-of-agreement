@@ -17,7 +17,7 @@ pub fn mean_m2df32(data: Vec<Vec<f32>>) -> f32{
     return data_mean;
 }
 
-pub fn std_m2df32(data: Vec<Vec<f32>>) -> f32{
+pub fn std_m2df32(data: &Vec<Vec<f32>>) -> f32{
     let data_mean = mean_m2df32(data.clone());
     let mut vec_std: Vec<f32> = Vec::new();
     for row in data.clone().iter(){
