@@ -1,12 +1,13 @@
 use rayon::prelude::*;
 use crate::tools::{area2distri,entropy_info};
-use crate::mat_op::{std_m2df32,mean_m1df32};
+use crate::mat_op::{std_m2df32,mean_m1df32,variance_m2df32};
 
 pub fn g_unit_aggr(data: Vec<Vec<f32>>) -> Vec<Vec<f32>>{
     println!("FINDING THAT BITCH!!!");
     let data_norm = z_norm(&data);
 
     let g_matrix = find_opti_g_matrix(data_norm);
+    //let g_matrix = compute_g_matrix(&data_norm,&1f32);
 
     return g_matrix;
 }
@@ -68,12 +69,12 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
     let mut mat_n = compute_g_matrix(&data_in, &load_std);
     let mut mat_n1 = compute_g_matrix(&data_in, &(load_std+learning_rate));
 
-    let mut entropy_n = entropy_info(&mat_n);
-    let mut entropy_n1 = entropy_info(&mat_n1);
+    let mut entropy_n = variance_m2df32(&mat_n);
+    let mut entropy_n1 = variance_m2df32(&mat_n1);
 
     if entropy_n > entropy_n1{
         mat_n1 = compute_g_matrix(&data_in, &(load_std-learning_rate));
-        entropy_n1= entropy_info(&mat_n1);
+        entropy_n1= variance_m2df32(&mat_n1);
         if entropy_n >= entropy_n1{
             opti_g_matrix = mat_n;
         }else{
@@ -83,7 +84,7 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
                 entropy_n = entropy_n1;
                 mat_n = mat_n1;
                 mat_n1 = compute_g_matrix(&data_in, &load_std);
-                entropy_n1= entropy_info(&mat_n1); 
+                entropy_n1= variance_m2df32(&mat_n1); 
                 if entropy_n >= entropy_n1 {
                     opti_g_matrix = mat_n;
                     break;
@@ -97,7 +98,7 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
             entropy_n = entropy_n1;
             mat_n = mat_n1;
             mat_n1 = compute_g_matrix(&data_in, &load_std);
-            entropy_n1= entropy_info(&mat_n1); 
+            entropy_n1= variance_m2df32(&mat_n1); 
             if entropy_n >= entropy_n1 {
                 opti_g_matrix = mat_n;
                 break;

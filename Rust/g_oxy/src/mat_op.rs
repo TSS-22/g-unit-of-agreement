@@ -66,3 +66,22 @@ pub fn std_m1df32(data: Vec<f32>) -> f32{
     std_value = std_value.sqrt()/i;
     return std_value;
 }
+
+pub fn variance_m2df32(data: &Vec<Vec<f32>>)->f32{
+    let mut mean:f32 = 0f32;
+    let mut variance:f32 = 0f32;
+
+    for row in data.iter(){
+        for val in row.iter(){
+            mean = mean+val;
+        }
+    }
+    mean=mean/((data.len()*data[0].len()) as f32);
+    for row in data.iter(){
+        for val in row.iter(){
+            variance = (val-mean).powi(2);
+        }
+    }
+    variance=variance/((data.len()*data[0].len()) as f32);
+    return variance; 
+}

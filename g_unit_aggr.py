@@ -54,10 +54,10 @@ def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistr
     ntrp_g_matrix_n = entropy_info(g_unit_aggr(arg_values,arg_resolution, arg_stdDev, arg_widthDistri))
     ntrp_g_matrix_n1 = entropy_info(g_unit_aggr(arg_values, arg_resolution, arg_stdDev+arg_learning_rate, arg_widthDistri))
 
-    if ntrp_g_matrix_n>ntrp_g_matrix_n1:
+    if ntrp_g_matrix_n.abs()>ntrp_g_matrix_n1.abs():
         arg_stdDev=arg_stdDev-arg_learning_rate
         ntrp_g_matrix_n1 = entropy_info(g_unit_aggr(arg_values, arg_resolution, arg_stdDev, arg_widthDistri))
-        if ntrp_g_matrix_n>ntrp_g_matrix_n1:
+        if ntrp_g_matrix_n.abs()>ntrp_g_matrix_n1.abs():
             return g_unit_aggr(arg_values, arg_resolution, arg_stdDev, arg_widthDistri)
         else:
             while True:
@@ -70,7 +70,7 @@ def g_unit_aggr_auto(arg_values,arg_resolution=100, arg_stdDev=1, arg_widthDistr
         while True:
             arg_stdDev=arg_stdDev+arg_learning_rate
             ntrp_g_matrix_n1 = entropy_info(g_unit_aggr(arg_values, arg_resolution, arg_widthDistri, arg_stdDev))
-            if ntrp_g_matrix_n>=ntrp_g_matrix_n1:
+            if ntrp_g_matrix_n.abs()>=ntrp_g_matrix_n1.abs():
                 return g_unit_aggr(arg_values, arg_resolution, arg_stdDev-arg_learning_rate, arg_widthDistri)
 
 
