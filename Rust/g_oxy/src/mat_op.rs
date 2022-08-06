@@ -85,3 +85,14 @@ pub fn variance_m2df32(data: &Vec<Vec<f32>>)->f32{
     variance=variance/((data.len()*data[0].len()) as f32);
     return variance; 
 }
+
+pub fn sum_md2f32(data_in: &Vec<Vec<f32>>) -> f32{
+    let mut sum: f32 = 0f32;
+
+    for row in data_in.iter(){
+        for val in row.iter(){
+            sum=sum+val;
+        }
+    }
+    return sum;
+}
