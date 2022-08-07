@@ -38,31 +38,8 @@ fn z_norm(data: &Vec<Vec<f32>>)->Vec<Vec<f32>>{
     return data_out;
 }
 
+
 fn compute_g_matrix(data_in: &Vec<Vec<f32>>, load_std: &f32)->Vec<Vec<f32>>{
-    let mut temp_row2: Vec<f32> = Vec::new();
-    let mut temp_row1: Vec<f32> = Vec::new();
-    let mut data_out: Vec<Vec<f32>> = Vec::new();
-    
-    for row1 in data_in.iter(){
-        for row2 in data_in.iter(){
-            for (val1, val2) in row1.iter().zip(row2.iter()){
-                if val1.max(*val2)==*val1{
-                    temp_row2.push(area2distri(*val1, *val2, &load_std));
-                } else {
-                    temp_row2.push(area2distri(*val2, *val1, &load_std));
-                }
-            }
-            temp_row1.push(mean_m1df32(&temp_row2));
-            temp_row2.clear();
-        }
-        data_out.push(temp_row1.clone());
-        temp_row1.clear();
-    }
-
-    return data_out;
-}
-
-fn compute_g_matrix2(data_in: &Vec<Vec<f32>>, load_std: &f32)->Vec<Vec<f32>>{
     let mut handles = Vec::new();
     let mut data_out: Vec<Vec<f32>> = Vec::new();
     
@@ -95,14 +72,14 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
     let mut load_std:f32 =std_m2df32(&data_in);
     let learning_rate:f32 = 0.05f32;
     let mut opti_g_matrix:Vec<Vec<f32>> = Vec::new();
-    let mut mat_n = compute_g_matrix2(&data_in, &load_std);
-    let mut mat_n1 = compute_g_matrix2(&data_in, &(load_std+learning_rate));
+    let mut mat_n = compute_g_matrix(&data_in, &load_std);
+    let mut mat_n1 = compute_g_matrix(&data_in, &(load_std+learning_rate));
 
     let mut objective_n = variance_m2df32(&mat_n)*sum_md2f32(&mat_n);
     let mut objective_n1 = variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1);
 
     if objective_n > objective_n1{
-        mat_n1 = compute_g_matrix2(&data_in, &(load_std-learning_rate));
+        mat_n1 = compute_g_matrix(&data_in, &(load_std-learning_rate));
         objective_n1= variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1);
         if objective_n >= objective_n1{
             opti_g_matrix = mat_n;
@@ -112,7 +89,7 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
                 load_std = load_std-learning_rate;
                 objective_n = objective_n1;
                 mat_n = mat_n1;
-                mat_n1 = compute_g_matrix2(&data_in, &load_std);
+                mat_n1 = compute_g_matrix(&data_in, &load_std);
                 objective_n1= variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1); 
                 if objective_n >= objective_n1 {
                     opti_g_matrix = mat_n;
@@ -126,7 +103,7 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
             load_std = load_std+learning_rate;
             objective_n = objective_n1;
             mat_n = mat_n1;
-            mat_n1 = compute_g_matrix2(&data_in, &load_std);
+            mat_n1 = compute_g_matrix(&data_in, &load_std);
             objective_n1= variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1); 
             if objective_n >= objective_n1 {
                 opti_g_matrix = mat_n;
