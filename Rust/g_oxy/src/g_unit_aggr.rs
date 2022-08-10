@@ -38,7 +38,6 @@ fn z_norm(data: &Vec<Vec<f32>>)->Vec<Vec<f32>>{
     return data_out;
 }
 
-
 fn compute_g_matrix(data_in: &Vec<Vec<f32>>, load_std: &f32)->Vec<Vec<f32>>{
     let mut handles = Vec::new();
     let mut data_out: Vec<Vec<f32>> = Vec::new();

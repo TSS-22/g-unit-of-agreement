@@ -14,7 +14,6 @@ pub fn area2distri(val1: f32, val2: f32, &width_distri: &f32) -> f32{
     let error_margin:f32 = 0.0066929f32;
     let val: f32 = (val1-val2)/width_distri;
     if  val < 1f32{
-        // Wrong formula
         area = 1f32-(0.5f32+((5f32*val-2.5f32).tanh()/2f32)+((error_margin*2f32*val)-error_margin)); // we transform the logistic cumulative regression to be from [-inf; +inf] to [0;1]  
     }    
     return area as f32;
