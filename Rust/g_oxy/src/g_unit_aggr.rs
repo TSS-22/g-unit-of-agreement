@@ -1,19 +1,21 @@
 use rayon::prelude::*;
-use crate::tools::{area2distri};
-use crate::mat_op::{std_m2df32,mean_m1df32,variance_m2df32, sum_md2f32};
+use crate::tools::{area2distri, objective_fun};
+use crate::mat_op::{std_m1df32,mean_m1df32,variance_m1df32, sum_md1f32, reorder_m1d2m2d};
+
+// REPLACE SUM AND VAR FUNCTION BY OBJECTIVE FUNCTION
 
 pub fn g_unit_aggr(data: Vec<Vec<f32>>) -> Vec<Vec<f32>>{
-    println!("FINDING THAT BITCH!!!");
+    let row_len: usize = data.len();
+    let col_len: usize = data[0].len();
     let data_norm = z_norm(&data);
-
-    let g_matrix = find_opti_g_matrix(data_norm);
-    //let g_matrix = compute_g_matrix(&data_norm,&1f32);
-
+    let data_norm_flat = diff_flat(data_norm);
+    let g_matrix = find_opti_g_matrix(data_norm_flat, col_len);
+    let g_matrix = reorder_m1d2m2d(g_matrix, col_len);
     return g_matrix;
 }
 
-fn z_norm(data: &Vec<Vec<f32>>)->Vec<Vec<f32>>{
-    let mut data_out: Vec<Vec<f32>> = data.clone();
+fn z_norm(data_in: &Vec<Vec<f32>>)->Vec<Vec<f32>>{
+    let mut data = data_in.clone();
     for i in 0..data[0].len(){
         let mut mean:f32 = 0f32;
         let mut micro:f32 = 0f32;
@@ -31,55 +33,38 @@ fn z_norm(data: &Vec<Vec<f32>>)->Vec<Vec<f32>>{
         }
         std = (std/data.len() as f32).sqrt();
         // Z norm
-        for row_data in data_out.iter_mut(){
+        for row_data in data.iter_mut(){
             row_data[i]=(row_data[i]-mean)/std;
         }
     } 
+    return data;
+}
+
+fn diff_flat(data_in: Vec<Vec<f32>>)->Vec<f32>{
+    let mut data_out: Vec<f32> = Vec::new();
+    for row_1 in data_in.iter(){
+        for row_2 in data_in.iter(){
+            for (val1,val2) in row_1.iter().zip(row_2.iter()){
+                data_out.push(val1-val2);
+            }
+        }
+    }
     return data_out;
 }
 
-fn compute_g_matrix(data_in: &Vec<Vec<f32>>, load_std: &f32)->Vec<Vec<f32>>{
-    let mut handles = Vec::new();
-    let mut data_out: Vec<Vec<f32>> = Vec::new();
-    
-    handles = data_in.par_iter().map(|row1|{fn_row2(&data_in,&row1,load_std)}).collect();
-
-    return handles;
-}
-
-fn fn_row2(data_in: &Vec<Vec<f32>>, row1: &Vec<f32>, load_std: &f32)->Vec<f32>{
-    let mut handles = Vec::new();
-
-    handles = data_in.par_iter().map(|row2|{compute_area(&row1, &row2, &load_std)}).collect();
-
-    return handles;
-}
-
-fn compute_area(row1: &Vec<f32>, row2: &Vec<f32>, load_std: &f32)->f32{
-    let mut temp_row: Vec<f32> = Vec::new();
-    for (val1, val2) in row1.iter().zip(row2.iter()){
-        if val1.max(*val2)==*val1{
-            temp_row.push(area2distri(*val1, *val2, &load_std));
-        } else {
-            temp_row.push(area2distri(*val2, *val1, &load_std));
-        }
-    }
-    return mean_m1df32(&temp_row);
-}
-
-fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
-    let mut load_std:f32 =std_m2df32(&data_in);
+fn find_opti_g_matrix(data_in: Vec<f32>, chunk_size: usize)->Vec<f32>{
+    let mut load_std:f32 =std_m1df32(&data_in);
     let learning_rate:f32 = 0.05f32;
-    let mut opti_g_matrix:Vec<Vec<f32>> = Vec::new();
-    let mut mat_n = compute_g_matrix(&data_in, &load_std);
-    let mut mat_n1 = compute_g_matrix(&data_in, &(load_std+learning_rate));
+    let mut opti_g_matrix:Vec<f32> = Vec::new();
+    let mut mat_n = compute_g_matrix(&data_in, &load_std, &chunk_size);
+    let mut mat_n1 = compute_g_matrix(&data_in, &(load_std+learning_rate), &chunk_size);
 
-    let mut objective_n = variance_m2df32(&mat_n)*sum_md2f32(&mat_n);
-    let mut objective_n1 = variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1);
+    let mut objective_n = objective_fun(&mat_n1);
+    let mut objective_n1 = objective_fun(&mat_n1);
 
     if objective_n > objective_n1{
-        mat_n1 = compute_g_matrix(&data_in, &(load_std-learning_rate));
-        objective_n1= variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1);
+        mat_n1 = compute_g_matrix(&data_in, &(load_std-learning_rate), &chunk_size);
+        objective_n1= objective_fun(&mat_n1);
         if objective_n >= objective_n1{
             opti_g_matrix = mat_n;
         }else{
@@ -88,8 +73,8 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
                 load_std = load_std-learning_rate;
                 objective_n = objective_n1;
                 mat_n = mat_n1;
-                mat_n1 = compute_g_matrix(&data_in, &load_std);
-                objective_n1= variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1); 
+                mat_n1 = compute_g_matrix(&data_in, &load_std, &chunk_size);
+                objective_n1= objective_fun(&mat_n1);
                 if objective_n >= objective_n1 {
                     opti_g_matrix = mat_n;
                     break;
@@ -102,8 +87,8 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
             load_std = load_std+learning_rate;
             objective_n = objective_n1;
             mat_n = mat_n1;
-            mat_n1 = compute_g_matrix(&data_in, &load_std);
-            objective_n1= variance_m2df32(&mat_n1)*sum_md2f32(&mat_n1); 
+            mat_n1 = compute_g_matrix(&data_in, &load_std, &chunk_size);
+            objective_n1= objective_fun(&mat_n1);
             if objective_n >= objective_n1 {
                 opti_g_matrix = mat_n;
                 break;
@@ -112,3 +97,19 @@ fn find_opti_g_matrix(data_in: Vec<Vec<f32>>)->Vec<Vec<f32>>{
     }
     return opti_g_matrix;
 }
+
+fn compute_g_matrix(data_in: &Vec<f32>, load_std: &f32, chunk_size: &usize)->Vec<f32>{
+    let mut handles = Vec::new();
+    handles = data_in.par_chunks(*chunk_size).map(|diff_x_y|{compute_area(diff_x_y,load_std)}).collect();
+    return handles;
+}
+
+fn compute_area(diff_x_y: &[f32], load_std: &f32)->f32{
+    let mut temp_row: Vec<f32> = Vec::new();
+    for val in diff_x_y.iter(){
+        temp_row.push(area2distri(val.abs()/load_std));
+    }
+    return mean_m1df32(&temp_row);
+}
+
+
