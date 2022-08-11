@@ -1,11 +1,11 @@
 use rayon::prelude::*;
 use crate::tools::{area2distri, objective_fun};
-use crate::mat_op::{std_m1df32,mean_m1df32,variance_m1df32, sum_md1f32, reorder_m1d2m2d};
+use crate::mat_op::{std_m1df32,mean_m1df32,reorder_m1d2m2d};
 
 // REPLACE SUM AND VAR FUNCTION BY OBJECTIVE FUNCTION
 
 pub fn g_unit_aggr(data: Vec<Vec<f32>>) -> Vec<Vec<f32>>{
-    let row_len: usize = data.len();
+    println!("Let's go!!!");
     let col_len: usize = data[0].len();
     let data_norm = z_norm(&data);
     let data_norm_flat = diff_flat(data_norm);

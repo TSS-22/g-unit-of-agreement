@@ -1,14 +1,3 @@
-use rayon::prelude::*;
-
-pub fn entropy_info(matrix: &Vec<Vec<f32>>) -> f32{
-    let mut entropy_values: f32 = 0.0;
-    for mat_row in matrix {
-        for mat_val in mat_row{
-            entropy_values = entropy_values+(mat_val.exp2()*(mat_val.exp2()+0.1f32).ln());
-        }
-    }
-    return entropy_values;
-}
 
 pub fn area2distri(diff: f32) -> f32{
     let mut area:f32 = 0f32;
@@ -44,6 +33,6 @@ pub fn objective_fun(data: &Vec<f32>)->f32{
             variance = variance+(val-mean).powi(2);
     }
     variance=variance/i;
-    let obj_value = variance*sum;
+    let obj_value = 2f32.powf(variance)*1f32.powf(sum);
     return obj_value; 
 }
