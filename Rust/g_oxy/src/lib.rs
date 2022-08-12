@@ -5,7 +5,7 @@ mod mat_op;
 
 /// Formats the sum of two numbers as string.
 #[pyfunction]
-fn g_unit(data: Vec<Vec<f32>>) -> PyResult<Vec<Vec<f32>>> {
+fn g_unit(data: Vec<Vec<f64>>) -> PyResult<Vec<Vec<f64>>> {
     Ok(g_unit_aggr::g_unit_aggr(data))
 }
 
