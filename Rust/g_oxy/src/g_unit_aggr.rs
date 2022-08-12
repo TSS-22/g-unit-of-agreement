@@ -21,11 +21,16 @@ fn compute_std_col(data_in: Vec<Vec<f64>)->Vec<f64>{
     let mut std_vec: Vec<f64>=Vec::new();
     for i in 0..data_in[0].len(){
         let mut mean:f64 = 0f64;
+        let mut std:f64 = 0f64;
         for row_data in data_in.iter(){
             mean = mean+row_data[i];
         }
+        mean = mean/data_in.len() as f64;
+        for row_data in data.iter(){
+            std=std+(row_data[i]-mean).powi(2);
+        }
+        std_vec.push((std/data.len() as f64).sqrt());
     }
-
     return std_vec;
 }
 
