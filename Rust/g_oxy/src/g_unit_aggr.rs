@@ -136,7 +136,7 @@ fn compute_g_matrix(data_in: &Vec<f64>, load_std: &f64, chunk_size: &usize, std_
 fn compute_area(diff_x_y: &[f64], load_std: &f64, std_vec:&Vec<f64>)->f64{
     let mut temp_row: Vec<f64> = Vec::new();
     for (val,std) in diff_x_y.iter().zip(std_vec.iter()){
-        temp_row.push(area2distri((val.powi(2))/(load_std*std)));
+        temp_row.push(area2distri((val.powf(3.0))/(load_std*std)));
     }
     return mean_m1df64(&temp_row);
 }
