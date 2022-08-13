@@ -5,7 +5,7 @@ use crate::mat_op::{std_m1df64,mean_m1df64,reorder_m1d2m2d};
 // REPLACE SUM AND VAR FUNCTION BY OBJECTIVE FUNCTION
 
 pub fn g_unit_aggr(data: Vec<Vec<f64>>) -> Vec<Vec<f64>>{
-    println!("Let's puuuuuuuuuuuuuuuuuuut go!!!");
+    println!("Computing the G units");
     let row_len: usize = data.len();
     let col_len: usize = data[0].len();
     // let data_norm = z_norm(&data);
