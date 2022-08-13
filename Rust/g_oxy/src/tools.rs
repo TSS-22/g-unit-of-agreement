@@ -2,7 +2,7 @@
 pub fn area2distri(diff: f64) -> f64{
     let mut area:f64 = 0f64;
     // To account for the small error as we don't take the full logistic distribution to have a more dynamic behavior 
-    let error_margin:f64 = 0.0066929f64;
+    let error_margin:f64 = 0.0066928509242848f64;
     if  diff < 1f64{
         area = 1f64-(0.5f64+((5f64*diff-2.5f64).tanh()/2f64)+((error_margin*2f64*diff)-error_margin)); // we transform the logistic cumulative regression to be from [-inf; +inf] to [0;1]  
     }    
