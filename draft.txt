@@ -100,7 +100,7 @@ fn g_oxy(_py: Python, m: &PyModule) -> PyResult<()> {
 import g_oxy
 import numpy as np
 import time
-a = np.random.rand(100,100)
+a = np.random.rand(1000,1000)
 start = time.time()
 g_oxy.g_unit(a)
 end = time.time()
